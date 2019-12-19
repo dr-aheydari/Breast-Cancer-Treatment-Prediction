@@ -1,0 +1,65 @@
+---
+title: Predicting Breast Cancer Treatment Outcome using Machine Learning on Mutation
+  Profiles
+author: "Ali Heydari"
+project: Bioinformatics Final Project
+output:
+  html_document:
+    df_print: paged
+section: Data Processing Portion
+---
+
+
+Our data is the Breast Cancer data from TCGA (*TCGA-BRCA*) available [here](https://portal.gdc.cancer.gov/projects/TCGA-BRCA) (as of Sept. 20th 2019). The data format is *Mutation Annotated File (maf)*, and we can use a <code> maftools </code> (available [here](https://bioconductor.org/packages/release/bioc/html/maftools.html)) to explore the data. First, we want to install <code> maftools </code> through R.. 
+
+First we want to exolore the data for biological interpretations, such as top mutations etc.
+For this tast, we want to use `maftools`; below are the steps to install the software.
+
+```{r}
+options(repos="https://cran.rstudio.com" )
+
+# Install pre-req packages 
+install.packages("devtools")
+
+#Install Bioconductor dependencies.
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ComplexHeatmap")
+BiocManager::install("VariantAnnotation")
+BiocManager::install("Biostrings")
+
+```
+Now we want to install maftools
+
+```{r}
+#Install maftools from github repository.
+library("rlang")
+library("devtools")
+install_github(repo = "PoisonAlien/maftools")
+
+```
+
+```{r}
+# load maftools
+require(maftools)
+
+laml.maf = system.file('extdata', 'TCGA.GBM.mutect.da904cd3-79d7-4ae3-b6c0-e7127998b3e6.DR-10.0.somatic.maf.gz', package = 'maftools') #path to TCGA LAML MAF file
+
+#laml<- read.maf(maf ="TCGA.GBM.mutect.da904cd3-79d7-4ae3-b6c0-e7127998b3e6.DR-10.0.somatic.maf.gz", useAll = T, verbose = T)
+
+getwd()
+setwd("/Users/aliheydari/Box\ Sync/NRT-ICGE/Maftools\ Stuff/mutect.maf")
+  
+data <- read.maf(maf = "mutect.maf")
+
+getSampleSummary(data)
+
+plotmafSummary(maf = data, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRaw = FALSE)
+
+#We will draw oncoplots for top ten mutated genes.
+oncoplot(maf = data, top = 10, fontSize = 12)
+
+geneCloud(input = data, minMut = 5)
+```
+
+
